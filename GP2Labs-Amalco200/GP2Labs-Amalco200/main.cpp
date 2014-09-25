@@ -4,6 +4,10 @@
 //header for sdl2 functionality
 #include <SDL.h>
 
+//includes for opengl headers
+#include <SDL_opengl.h>
+#include <gl\GLU.h>
+
 //Global variables here
 //pointer to SDL windows
 SDL_Window*window;
@@ -14,6 +18,9 @@ const int WINDOW_WIDTH = 640;
 
 //while running this is true
 bool running = true;
+
+//sdl gl context
+SDL_GLContext glcontext = NULL;
 
 //Global functions
 void InitWindow(int width, int height, bool fullscreen)
@@ -32,8 +39,65 @@ void InitWindow(int width, int height, bool fullscreen)
 //used to clean up once we exit app
 void CleanUp()
 {
+	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+//initialise opengl
+void initOpenGL()
+{
+	glcontext = SDL_GL_CreateContext(window);
+	//something went wrong creating the context, if it is still null
+	if (!glcontext)
+	{
+		std::cout << "Error creating opengl context" << SDL_GetError() << std::endl;
+	}
+
+	//smooth shading
+	glShadeModel(GL_SMOOTH);
+	//clear background to black
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	//clear depth buffer to 1.0
+	glClearDepth(1.0f);
+	//enable depth testing
+	glEnable(GL_DEPTH_TEST);
+	//depth test to use
+	glDepthFunc(GL_LEQUAL);
+	//turn on prespective correction
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+}
+
+//function to set/reset viewport
+void setViewport(int width, int height)
+{
+	//screen ratio
+	GLfloat ratio;
+
+	//make sure height is always above 0
+	if (height == 0)
+	{
+		height = 1;
+	}
+
+	//calculate screen ratio
+	ratio = (GLfloat)width / (GLfloat)height;
+
+	//setup viewport
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+
+	//change to project matrix mode
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	//calculate perpective matrix using glu lib functions
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+	//switch to model view
+	glMatrixMode(GL_MODELVIEW);
+
+	//reset using identity matrix
+	glLoadIdentity();
 }
 
 //Main method - program entry point
@@ -47,6 +111,12 @@ int main(int argc, char*arg[])
 	}
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false);
+
+	//call our init opengl function
+	initOpenGL();
+
+	//set the wee viewport
+	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	SDL_Event event;
 
