@@ -100,6 +100,44 @@ void setViewport(int width, int height)
 	glLoadIdentity();
 }
 
+//function to draw shizzle
+void Render()
+{
+	//set the clear colourt which is the background
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	//clear colour and depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//switch ti model view
+	glMatrixMode(GL_MODELVIEW);
+
+	//reset using identity matrix
+	glLoadIdentity();
+
+	//translate to -5.0f on z-axis
+	glTranslatef(0.0f, 0.0f, -5.0f);
+
+	//draw dem triags
+	glBegin(GL_TRIANGLES);
+
+		glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
+		glVertex3f(1.0f, 0.0f, 0.0f);			//top
+		glVertex3f(-1.0f, -1.0f, 0.0f);			//bottom left
+		glVertex3f(1.0f, -1.0f, 0.0f);			//bottom right
+
+	glEnd();
+
+	//require to swap front and back buffers
+	SDL_GL_SwapWindow(window);
+}
+
+//function to update game state
+void Update()
+{
+
+}
+
 //Main method - program entry point
 int main(int argc, char*arg[])
 {
@@ -131,6 +169,9 @@ int main(int argc, char*arg[])
 				running = false;
 			}
 		}
+
+		Update();
+		Render();
 	}
 
 	CleanUp();
