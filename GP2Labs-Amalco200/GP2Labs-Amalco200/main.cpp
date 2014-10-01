@@ -143,47 +143,47 @@ void Render()
 	glBegin(GL_TRIANGLES);
 
 	//ICOSELES TRIANGLE
-		//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-		//glVertex3f(0.0f, 1.0f, 0.0f);			//top
-		//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
-		//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
+	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
+	//glVertex3f(0.0f, 1.0f, 0.0f);			//top
+	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
+	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
 
 	//RIGHT ANGLED TRIANGLE
-		//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-		//glVertex3f(1.0f, 0.0f, 0.0f);			//top
-		//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
-		//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
+	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
+	//glVertex3f(1.0f, 0.0f, 0.0f);			//top
+	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
+	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
 
 	//EACH VERTICE DIFF COLOUR
-		//glColor3f(1.0f, 0.0f, 0.0f);			//vertice 1 colour
-		//glVertex3f(1.0f, 0.0f, 0.0f);			//top
+	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice 1 colour
+	//glVertex3f(1.0f, 0.0f, 0.0f);			//top
 
-		//glColor3f(1.0f, 1.0f, 0.0f);			//vertice 2 colour
-		//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
+	//glColor3f(1.0f, 1.0f, 0.0f);			//vertice 2 colour
+	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
 
-		//glColor3f(1.0f, 0.0f, 1.0f);			//vertice 3 colour
-		//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
-	
+	//glColor3f(1.0f, 0.0f, 1.0f);			//vertice 3 colour
+	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
+
 	////DRAW 2 TRIANGLES
-		//	//triangle 1
-		//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-		//	glVertex3f(1.0f, 0.0f, 0.0f);			//top
-		//	glVertex3f(-1.0f, -1.0f, 0.0f);			//bottom left
-		//	glVertex3f(1.0f, -1.0f, 0.0f);			//bottom right
+	//	//triangle 1
+	//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
+	//	glVertex3f(1.0f, 0.0f, 0.0f);			//top
+	//	glVertex3f(-1.0f, -1.0f, 0.0f);			//bottom left
+	//	glVertex3f(1.0f, -1.0f, 0.0f);			//bottom right
 
-		//	//triangle 2
-		//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-		//	glVertex3f(0.9f, 0.0f, 0.0f);			//top
-		//	glVertex3f(-1.0f, -0.9f, 0.0f);			//bottom left
-		//	glVertex3f(-0.9f, 0.0f, 0.0f);			//bottom right
+	//	//triangle 2
+	//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
+	//	glVertex3f(0.9f, 0.0f, 0.0f);			//top
+	//	glVertex3f(-1.0f, -0.9f, 0.0f);			//bottom left
+	//	glVertex3f(-0.9f, 0.0f, 0.0f);			//bottom right
 
 	////2 TRIANGLES USING OWN METHOD TO CREATE THEM
-		//CreateTriangle(0.9f, -1.0f, -0.9f, 0.0f, -0.9f, 0.0f, 0.0f, 0.0f, 0.0f);
+	//CreateTriangle(0.9f, -1.0f, -0.9f, 0.0f, -0.9f, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		//CreateTriangle(1.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f);
+	//CreateTriangle(1.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f);
 
 	//USE GLOBAL VARIABLES TO POSITION TRIANGLE VERTICES
-		CreateTriangle(v1X, v2X, v3X, v1Y, v2Y, v3Y, v1Z, v2Z, v3Z);
+	CreateTriangle(v1X, v2X, v3X, v1Y, v2Y, v3Y, v1Z, v2Z, v3Z);
 
 
 	glEnd();
@@ -232,6 +232,57 @@ int main(int argc, char*arg[])
 			{
 				//set boolean to false to exit game loop
 				running = false;
+			}
+
+			//open case statement
+			switch (event.type){
+				//try to find a keypress :)
+				//check if key is down
+			case SDL_KEYDOWN:
+				//check if its the right key that is pressed
+				switch (event.key.keysym.sym)
+				{
+					//if left
+				case SDLK_LEFT:
+				{
+					v1X = v1X - 0.01f;
+					v2X = v2X - 0.01f;
+					v3X = v3X - 0.01f;
+				}
+					break;
+
+					//if right
+				case SDLK_RIGHT:
+				{
+					v1X = v1X + 0.01f;
+					v2X = v2X + 0.01f;
+					v3X = v3X + 0.01f;
+				}
+					break;
+
+					//if up
+				case SDLK_UP:
+				{
+					v1Y = v1Y + 0.01f;
+					v2Y = v2Y + 0.01f;
+					v3Y = v3Y + 0.01f;
+				}
+					break;
+
+					//if down
+				case SDLK_DOWN:
+				{
+					v1Y = v1Y - 0.01f;
+					v2Y = v2Y - 0.01f;
+					v3Y = v3Y - 0.01f;
+				}
+					break;
+
+					//not sure what the default is for? ask Brian.
+				default:
+					break;
+				}
+				break;
 			}
 		}
 
