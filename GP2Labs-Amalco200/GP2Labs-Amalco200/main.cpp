@@ -27,6 +27,14 @@ bool running = true;
 //need a more efficient way of doing this
 float v1X = 0.0f, v2X = -1.0f, v3X = 1.0f, v1Y = 1.0f, v2Y = -1.0f, v3Y = -1.0f, v1Z = 0.0f, v2Z = 0.0f, v3Z = 0.0f;
 
+// vertex buffer object variable
+GLuint triangleVBO;
+
+//triangle data
+float triangleData[] = { 0.0f, 1.0f, 0.0f			//top
+						- 1.0f, -1.0f, 0.0f,		//bottom left
+						1.0f, -1.0f, 0.0f };		//bottom right
+
 //sdl gl context
 SDL_GLContext glcontext = NULL;
 
@@ -47,6 +55,9 @@ void InitWindow(int width, int height, bool fullscreen)
 //used to clean up once we exit app
 void CleanUp()
 {
+	//clean geometry stuff
+	glDeleteBuffers(1, &triangleVBO);
+
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -130,6 +141,17 @@ void CreateTriangle(float x1, float x2, float x3, float y1, float y2, float y3, 
 	CreatePoint(x3, y3, z3);
 }
 
+void InitGeometry()
+{
+	//create buffer
+	glGenBuffers(1, &triangleVBO);
+
+	//make vbo active
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+
+	//copy vertex data into buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData), triangleData, GL_STATIC_DRAW);
+}
 
 //function to draw shizzle
 void Render()
@@ -140,63 +162,41 @@ void Render()
 	//clear colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//switch ti model view
+	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+
+	//establish 3 coords per vertex with zero stride (space between elements)
+	//in array and contain floating point numbers
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+	//establish array contains vertices and not normals colours or tex coords
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	//switch to model view
 	glMatrixMode(GL_MODELVIEW);
 
-	//reset using identity matrix
-	glLoadIdentity();
+	//triangle 1
+		//reset using identity matrix
+		glLoadIdentity();
 
-	//translate to -5.0f on z-axis
-	glTranslatef(0.0f, 0.0f, -5.0f);
+		//translate
+		glTranslatef(0.0f, 0.0f, -6.0f);
 
-	//draw dem triags
-	glBegin(GL_TRIANGLES);
-
-	//ICOSELES TRIANGLE
-	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-	//glVertex3f(0.0f, 1.0f, 0.0f);			//top
-	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
-	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
-
-	//RIGHT ANGLED TRIANGLE
-	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-	//glVertex3f(1.0f, 0.0f, 0.0f);			//top
-	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
-	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
-
-	//EACH VERTICE DIFF COLOUR
-	//glColor3f(1.0f, 0.0f, 0.0f);			//vertice 1 colour
-	//glVertex3f(1.0f, 0.0f, 0.0f);			//top
-
-	//glColor3f(1.0f, 1.0f, 0.0f);			//vertice 2 colour
-	//glVertex3f(-1.0f, -1.0f, 0.0f);		//bottom left
-
-	//glColor3f(1.0f, 0.0f, 1.0f);			//vertice 3 colour
-	//glVertex3f(1.0f, -1.0f, 0.0f);		//bottom right
-
-	////DRAW 2 TRIANGLES
-	//	//triangle 1
-	//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-	//	glVertex3f(1.0f, 0.0f, 0.0f);			//top
-	//	glVertex3f(-1.0f, -1.0f, 0.0f);			//bottom left
-	//	glVertex3f(1.0f, -1.0f, 0.0f);			//bottom right
-
-	//	//triangle 2
-	//	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-	//	glVertex3f(0.9f, 0.0f, 0.0f);			//top
-	//	glVertex3f(-1.0f, -0.9f, 0.0f);			//bottom left
-	//	glVertex3f(-0.9f, 0.0f, 0.0f);			//bottom right
-
-	////2 TRIANGLES USING OWN METHOD TO CREATE THEM
-	//CreateTriangle(0.9f, -1.0f, -0.9f, 0.0f, -0.9f, 0.0f, 0.0f, 0.0f, 0.0f);
-
-	//CreateTriangle(1.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f);
-
-	//USE GLOBAL VARIABLES TO POSITION TRIANGLE VERTICES
-	CreateTriangle(v1X, v2X, v3X, v1Y, v2Y, v3Y, v1Z, v2Z, v3Z);
+		//actually draw the triangle
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
-	glEnd();
+	////triangle 2
+	//	//reset using identity matrix
+	//	glLoadIdentity();
+
+	//	//translate
+	//	glTranslatef(1.0f, 1.0f, -6.0f);
+
+	//	//actually draw the triangle
+	//	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
@@ -227,6 +227,7 @@ int main(int argc, char*arg[])
 
 	//call our init opengl function
 	initOpenGL();
+	InitGeometry();
 
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
