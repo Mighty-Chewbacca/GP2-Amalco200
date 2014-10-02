@@ -181,22 +181,29 @@ void Render()
 
 		//translate
 		glTranslatef(0.0f, 0.0f, -6.0f);
+		//look at this for 2D camera
+		//glOrtho() or gluOrtho2D
+
+		//Look at the 3D
+		//gluLookAt
+
+		
 
 		//actually draw the triangle
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
-	////triangle 2
-	//	//reset using identity matrix
-	//	glLoadIdentity();
+	//triangle 2
+		//reset using identity matrix
+		glLoadIdentity();
 
-	//	//translate
-	//	glTranslatef(1.0f, 1.0f, -6.0f);
+		//translate
+		glTranslatef(1.0f, 1.0f, -6.0f);
 
-	//	//actually draw the triangle
-	//	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//	glDrawArrays(GL_TRIANGLES, 0, 3);
+		//actually draw the triangle
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
