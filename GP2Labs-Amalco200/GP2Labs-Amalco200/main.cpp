@@ -1,6 +1,9 @@
 //Header files
 #include <iostream>
 
+//header file for glew
+#include <GL/glew.h>
+
 //header for sdl2 functionality
 #include <SDL.h>
 
@@ -71,6 +74,13 @@ void initOpenGL()
 	glDepthFunc(GL_LEQUAL);
 	//turn on prespective correction
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+		/*Problem: glewInitfailed, something is seriously wrong*/
+		std::cout << "Error:" << glewGetErrorString(err) << std::endl;
+	}
 }
 
 //function to set/reset viewport
