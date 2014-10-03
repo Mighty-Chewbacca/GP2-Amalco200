@@ -28,135 +28,62 @@ bool running = true;
 // vertex buffer object variable
 GLuint triangleVBO;
 
+//element buffer object
+GLuint triangleEBO;
+
 //triangle data now contains both rgba and xyz
 Vertex triangleData[] = {
 
 #pragma region Front_face
 	//Front face
 		{ -0.5f, 0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f },// Top Left
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
 
 		{ -0.5f, -0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f },// Bottom Left
+		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
 
 		{ 0.5f, -0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f }, //Bottom Right
+		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
 
 		{ 0.5f, 0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f },// Top Right
-
-		{ -0.5f, 0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f },// Top Left
-
-		{ 0.5f, -0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f, 1.0f }, //Bottom Right
+		1.0f, 1.0f, 1.0f, 1.0f },// Top Right
 #pragma endregion
 
 #pragma region Back_face
 		//back face
 		{ -0.5f, 0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f },// Top Left
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
 
 		{ -0.5f, -0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f },// Bottom Left
+		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
 
 		{ 0.5f, -0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
 
 		{ 0.5f, 0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f },// Top Right
-
-		{ -0.5f, 0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f },// Top Left
-
-		{ 0.5f, -0.5f, -0.5f,
-		1.5f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Right
 #pragma endregion
 
-#pragma region Left_face
-		//left face
-		{ -0.5f, 0.5f, -0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f },// Top Left
+};
 
-		{ -0.5f, -0.5f, -0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+GLuint indices[] = {
+	//front
+	0, 1, 2, 0, 3, 2,
 
-		{ -0.5f, -0.5f, 0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+	//left
+	4, 5, 1, 4, 1, 0,
 
-		{ -0.5f, 0.5f, 0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f },// Top Right
+	//right
+	3, 7, 2, 7, 6, 2,
 
-		{ -0.5f, 0.5f, -0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f },// Top Left
+	//bottom
+	1, 5, 2, 6, 2, 1,
 
-		{ -0.5f, -0.5f, 0.5f,
-		0.0f, 1.0f, 0.0f, 1.0f }, //Bottom Right
-#pragma endregion
+	//top
+	5, 0, 7, 5, 7, 3,
 
-#pragma region Right_face
-		//right face
-		{ 0.5f, 0.5f, -0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f },// Top Left
-
-		{ 0.5f, -0.5f, -0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f },// Bottom Left
-
-		{ 0.5f, -0.5f, 0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f }, //Bottom Right
-
-		{ 0.5f, 0.5f, 0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f },// Top Right
-
-		{ 0.5f, 0.5f, -0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f },// Top Left
-
-		{ 0.5f, -0.5f, 0.5f,
-		1.0f, 0.0f, 0.0f, 1.0f }, //Bottom Right
-#pragma endregion
-
-#pragma region Top_face
-		//top face
-		{ -0.5f, 0.5f, -0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f },// far Left
-
-		{ -0.5f, 0.5f, 0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f },// near Left
-
-		{ 0.5f, 0.5f, 0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f }, //near Right
-
-		{ 0.5f, 0.5f, -0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f },// far Right
-
-		{ -0.5f, 0.5f, -0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f },// far Left
-
-		{ 0.5f, 0.5f, 0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f }, //near Right
-#pragma endregion
-
-#pragma region Bottom_face
-		//bottom face
-		{ -0.5f, -0.5f, -0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f },// far Left
-
-		{ -0.5f, -0.5f, 0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f },// near Left
-
-		{ 0.5f, -0.5f, 0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f }, //near Right
-
-		{ 0.5f, -0.5f, -0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f },// far Right
-
-		{ -0.5f, -0.5f, -0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f },// far Left
-
-		{ 0.5f, -0.5f, 0.5f,
-		1.5f, 0.0f, 1.5f, 1.0f }, //near Right
-#pragma endregion
-
+	//back
+	4, 5, 6, 4, 7, 6
 };
 
 
@@ -182,6 +109,7 @@ void InitWindow(int width, int height, bool fullscreen)
 void CleanUp()
 {
 	//clean geometry stuff
+	glDeleteBuffers(1, &triangleEBO);
 	glDeleteBuffers(1, &triangleVBO);
 
 	SDL_GL_DeleteContext(glcontext);
@@ -262,6 +190,15 @@ void InitGeometry()
 
 	//copy vertex data into buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData), triangleData, GL_STATIC_DRAW);
+
+	//create element buffer
+	glGenBuffers(1, &triangleEBO);
+
+	//make active
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
+
+	//copy index data to ebo
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 //function to draw shizzle
@@ -275,6 +212,7 @@ void Render()
 
 	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
 
 	//the 3 parameter is now filled out, the pipeline needs to know the size of each vertex
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
@@ -305,7 +243,7 @@ void Render()
 		//gluLookAt
 
 		//actually draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / sizeof(Vertex));
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 		//triangle 2
 		//reset using identity matrix
@@ -318,7 +256,7 @@ void Render()
 		glTranslatef(1.25f, 1.25f, -6.0f);
 
 		//actually draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / sizeof(Vertex));
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 
 	//require to swap front and back buffers
