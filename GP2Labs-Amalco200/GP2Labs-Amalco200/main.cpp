@@ -11,6 +11,9 @@
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
 
+//includes for custom headers made by me
+#include "Vertex.h"
+
 //Global variables here
 //pointer to SDL windows
 SDL_Window*window;
@@ -25,10 +28,19 @@ bool running = true;
 // vertex buffer object variable
 GLuint triangleVBO;
 
-//triangle data
-float triangleData[] = { 0.0f, 1.0f, 0.0f,			//top
-						-1.0f, -1.0f, 0.0f,		//bottom left
-						1.0f, -1.0f, 0.0f };		//bottom right
+//triangle data now contains both rgba and xyz
+Vertex triangleData[] = {
+							{ 0.0f, 1.0f, 0.0f,				//xyz
+							1.0f, 0.0f, 0.0f, 1.0f },		//rgba
+
+						{ -1.0f, -1.0f, 0.0f,				//xyz
+							0.0f, 1.0f, 0.0f, 1.0f },		//rgba
+
+						{ 1.0f, -1.0f, 0.0f,				//xyz
+							0.0f, 0.0f, 1.0f, 1.0f }		//rgba
+						};
+
+
 
 //sdl gl context
 SDL_GLContext glcontext = NULL;
@@ -145,12 +157,15 @@ void Render()
 	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 
-	//establish 3 coords per vertex with zero stride (space between elements)
-	//in array and contain floating point numbers
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	//the 3 parameter is now filled out, the pipeline needs to know the size of each vertex
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
 
-	//establish array contains vertices and not normals colours or tex coords
+	//the last parameter basically says that the colours starts 3 floats into each element of the array
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void**)(3 * sizeof(float)));
+
+	//establish array contains vertices and normals colours
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
 
 	//switch to model view
 	glMatrixMode(GL_MODELVIEW);
@@ -160,7 +175,7 @@ void Render()
 		glLoadIdentity();
 
 		//translate
-		glTranslatef(-1.0f, -1.0f, -6.0f);
+		glTranslatef(-1.25f, -1.25f, -6.0f);
 		//look at this for 2D camera
 		//glOrtho() or gluOrtho2D
 
@@ -168,18 +183,18 @@ void Render()
 		//gluLookAt
 
 		//actually draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / sizeof(Vertex));
 
-
-	//triangle 2
+		//triangle 2
 		//reset using identity matrix
 		glLoadIdentity();
 
 		//translate
-		glTranslatef(1.0f, 1.0f, -6.0f);
+		glTranslatef(1.25f, 1.25f, -6.0f);
 
 		//actually draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / sizeof(Vertex));
+
 
 	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
