@@ -52,12 +52,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Specialised Applications\SDL2\include;F:\Libraries\SDL2\SDL2-2.0.3\include;C:\Specialised Applications\glew-1.11.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Specialised Applications\SDL2\include;F:\Libraries\SDL2\SDL2-2.0.3\include;C:\Specialised Applications\glew-1.11.0\include;F:\Libraries\GLEW\glew-1.11.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Specialised Applications\SDL2\lib\x86;F:\Libraries\SDL2\SDL2-2.0.3\lib\x86;C:\Specialised Applications\glew-1.11.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Specialised Applications\SDL2\lib\x86;F:\Libraries\SDL2\SDL2-2.0.3\lib\x86;C:\Specialised Applications\glew-1.11.0\lib\Release\Win32;F:\Libraries\GLEW\glew-1.11.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
