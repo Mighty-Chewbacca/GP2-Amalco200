@@ -25,6 +25,18 @@ const int WINDOW_WIDTH = 640;
 //while running this is true
 bool running = true;
 
+//bools for moving on axis
+//going to allow user to choose an axis and then move it on that axis
+bool xAxis = false;
+bool yAxis = false;
+bool zAxis = false;
+
+//variables for the cubes position in the world
+float xPos = 0, yPos = 0, zPos = -5;
+
+float xPos2 = 1.8f, yPos2 = 1.255f, zPos2 = -5;
+
+
 // vertex buffer object variable
 GLuint triangleVBO;
 
@@ -67,20 +79,23 @@ Vertex triangleData[] = {
 };
 
 GLuint indices[] = {
+
+	//personal notes, every 3 numbers relates to 1 triangle, they connect to each other, the number relates to the number of the vertice and not the amount of times it is touched
+
 	//front
 	0, 1, 2, 0, 3, 2,
 
 	//left
-	4, 5, 1, 4, 1, 0,
+	4, 5, 1, 4, 0, 1,
 
 	//right
 	3, 7, 2, 7, 6, 2,
 
 	//bottom
-	1, 5, 2, 6, 2, 1,
+	1, 5, 2, 6, 2, 5,
 
 	//top
-	5, 0, 7, 5, 7, 3,
+	4, 7, 0, 0, 3, 7,
 
 	//back
 	4, 5, 6, 4, 7, 6
@@ -201,6 +216,38 @@ void InitGeometry()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
+//method to change the axis the user is affecting
+void ChangeAxis(int newAxis)
+{
+	if (newAxis == 0)
+	{
+		xAxis = true;
+		yAxis = false;
+		zAxis = false;
+	}
+
+	if (newAxis == 1)
+	{
+		xAxis = false;
+		yAxis = true;
+		zAxis = false;
+	}
+
+	if (newAxis == 2)
+	{
+		xAxis = false;
+		yAxis = false;
+		zAxis = true;
+	}
+}
+
+//change the command the user is using
+void ChangeCommands()
+{
+
+}
+
+
 //function to draw shizzle
 void Render()
 {
@@ -235,7 +282,7 @@ void Render()
 		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
 		//translate
-		glTranslatef(-1.25f, -1.25f, -6.0f);
+		glTranslatef(xPos, yPos, zPos);
 		//look at this for 2D camera
 		//glOrtho() or gluOrtho2D
 
@@ -253,7 +300,7 @@ void Render()
 		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
 		//translate
-		glTranslatef(1.25f, 1.25f, -6.0f);
+		glTranslatef(xPos2, yPos2, zPos2);
 
 		//actually draw the triangle
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
@@ -312,33 +359,99 @@ int main(int argc, char*arg[])
 					//if left
 				case SDLK_LEFT:
 				{
-
+					if (xAxis)
+					{
+						xPos = xPos - 0.1f;
+					}
+					if (yAxis)
+					{
+						yPos = yPos - 0.1f;
+					}
+					if (zAxis)
+					{
+						zPos = zPos - 0.1f;
+					}
 				}
 					break;
 
 					//if right
 				case SDLK_RIGHT:
 				{
-					
+					if (xAxis)
+					{
+						xPos = xPos + 0.1f;
+					}
+					if (yAxis)
+					{
+						yPos = yPos + 0.1f;
+					}
+					if (zAxis)
+					{
+						zPos = zPos + 0.1f;
+					}
 				}
 					break;
 
 					//if up
 				case SDLK_UP:
 				{
-					
+					if (xAxis)
+					{
+
+					}
+
+					if (yAxis)
+					{
+
+					}
+
+					if (zAxis)
+					{
+
+					}
+
 				}
 					break;
 
 					//if down
 				case SDLK_DOWN:
 				{
-					
+					if (xAxis)
+					{
+
+					}
+
+					if (yAxis)
+					{
+
+					}
+
+					if (zAxis)
+					{
+
+					}
 				}
 					break;
 
-					//not sure what the default is for? ask Brian.
-				default:
+					//if x is pressed
+				case SDLK_x:
+				{
+					ChangeAxis(0);
+				}
+					break;
+
+					//if y is pressed
+				case SDLK_y:
+				{
+					ChangeAxis(1);
+				}
+					break;
+
+					//if z is pressed
+				case SDLK_z:
+				{
+					ChangeAxis(2);
+				}
 					break;
 				}
 				break;
