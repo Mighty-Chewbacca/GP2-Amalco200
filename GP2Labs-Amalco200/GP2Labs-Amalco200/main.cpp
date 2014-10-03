@@ -30,15 +30,134 @@ GLuint triangleVBO;
 
 //triangle data now contains both rgba and xyz
 Vertex triangleData[] = {
-							{ 0.0f, 1.0f, 0.0f,				//xyz
-							1.0f, 0.0f, 0.0f, 1.0f },		//rgba
 
-						{ -1.0f, -1.0f, 0.0f,				//xyz
-							0.0f, 1.0f, 0.0f, 1.0f },		//rgba
+#pragma region Front_face
+	//Front face
+		{ -0.5f, 0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f },// Top Left
 
-						{ 1.0f, -1.0f, 0.0f,				//xyz
-							0.0f, 0.0f, 1.0f, 1.0f }		//rgba
-						};
+		{ -0.5f, -0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f },// Bottom Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f }, //Bottom Right
+
+		{ 0.5f, 0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f },// Top Right
+
+		{ -0.5f, 0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f },// Top Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		0.0f, 0.0f, 1.0f, 1.0f }, //Bottom Right
+#pragma endregion
+
+#pragma region Back_face
+		//back face
+		{ -0.5f, 0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f },// Top Left
+
+		{ -0.5f, -0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f },// Bottom Left
+
+		{ 0.5f, -0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+
+		{ 0.5f, 0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f },// Top Right
+
+		{ -0.5f, 0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f },// Top Left
+
+		{ 0.5f, -0.5f, -0.5f,
+		1.5f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+#pragma endregion
+
+#pragma region Left_face
+		//left face
+		{ -0.5f, 0.5f, -0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f },// Top Left
+
+		{ -0.5f, -0.5f, -0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+
+		{ -0.5f, -0.5f, 0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+
+		{ -0.5f, 0.5f, 0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f },// Top Right
+
+		{ -0.5f, 0.5f, -0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f },// Top Left
+
+		{ -0.5f, -0.5f, 0.5f,
+		0.0f, 1.0f, 0.0f, 1.0f }, //Bottom Right
+#pragma endregion
+
+#pragma region Right_face
+		//right face
+		{ 0.5f, 0.5f, -0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f },// Top Left
+
+		{ 0.5f, -0.5f, -0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f },// Bottom Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f }, //Bottom Right
+
+		{ 0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f },// Top Right
+
+		{ 0.5f, 0.5f, -0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f },// Top Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		1.0f, 0.0f, 0.0f, 1.0f }, //Bottom Right
+#pragma endregion
+
+#pragma region Top_face
+		//top face
+		{ -0.5f, 0.5f, -0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f },// far Left
+
+		{ -0.5f, 0.5f, 0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f },// near Left
+
+		{ 0.5f, 0.5f, 0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f }, //near Right
+
+		{ 0.5f, 0.5f, -0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f },// far Right
+
+		{ -0.5f, 0.5f, -0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f },// far Left
+
+		{ 0.5f, 0.5f, 0.5f,
+		1.0f, 1.0f, 1.0f, 1.0f }, //near Right
+#pragma endregion
+
+#pragma region Bottom_face
+		//bottom face
+		{ -0.5f, -0.5f, -0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f },// far Left
+
+		{ -0.5f, -0.5f, 0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f },// near Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f }, //near Right
+
+		{ 0.5f, -0.5f, -0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f },// far Right
+
+		{ -0.5f, -0.5f, -0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f },// far Left
+
+		{ 0.5f, -0.5f, 0.5f,
+		1.5f, 0.0f, 1.5f, 1.0f }, //near Right
+#pragma endregion
+
+};
 
 
 
