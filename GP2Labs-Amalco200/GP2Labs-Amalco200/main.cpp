@@ -22,17 +22,12 @@ const int WINDOW_WIDTH = 640;
 //while running this is true
 bool running = true;
 
-//floats for 1 triangle, v is vor vertice, number is number of vertice and final letter is for the part of the coord it relates to.
-//if doing this for multiple i will be adding in T and a number as well, to represent triangle
-//need a more efficient way of doing this
-float v1X = 0.0f, v2X = -1.0f, v3X = 1.0f, v1Y = 1.0f, v2Y = -1.0f, v3Y = -1.0f, v1Z = 0.0f, v2Z = 0.0f, v3Z = 0.0f;
-
 // vertex buffer object variable
 GLuint triangleVBO;
 
 //triangle data
-float triangleData[] = { 0.0f, 1.0f, 0.0f			//top
-						- 1.0f, -1.0f, 0.0f,		//bottom left
+float triangleData[] = { 0.0f, 1.0f, 0.0f,			//top
+						-1.0f, -1.0f, 0.0f,		//bottom left
 						1.0f, -1.0f, 0.0f };		//bottom right
 
 //sdl gl context
@@ -126,21 +121,6 @@ void setViewport(int width, int height)
 	glLoadIdentity();
 }
 
-//used to create one of the points of the triangle, takes 3 floats which each become part of the coord of the point
-void CreatePoint(float x, float y, float z)
-{
-	glVertex3f(x, y, z);
-}
-
-//used to create the triangle, takes in 9 floats which will become the 9 coords for the vertices
-void CreateTriangle(float x1, float x2, float x3, float y1, float y2, float y3, float z1, float z2, float z3)
-{
-	glColor3f(1.0f, 0.0f, 0.0f);			//vertice colours
-	CreatePoint(x1, y1, z1);
-	CreatePoint(x2, y2, z2);
-	CreatePoint(x3, y3, z3);
-}
-
 void InitGeometry()
 {
 	//create buffer
@@ -180,17 +160,14 @@ void Render()
 		glLoadIdentity();
 
 		//translate
-		glTranslatef(0.0f, 0.0f, -6.0f);
+		glTranslatef(-1.0f, -1.0f, -6.0f);
 		//look at this for 2D camera
 		//glOrtho() or gluOrtho2D
 
 		//Look at the 3D
 		//gluLookAt
 
-		
-
 		//actually draw the triangle
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
@@ -202,7 +179,6 @@ void Render()
 		glTranslatef(1.0f, 1.0f, -6.0f);
 
 		//actually draw the triangle
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//require to swap front and back buffers
@@ -212,11 +188,6 @@ void Render()
 //function to update game state
 void Update()
 {
-	////move triangle test!!!
-	//v1X = v1X + 0.01f;
-	//v2X = v2X + 0.01f;
-	//v3X = v3X + 0.01f;
-
 
 }
 
@@ -263,36 +234,28 @@ int main(int argc, char*arg[])
 					//if left
 				case SDLK_LEFT:
 				{
-					v1X = v1X - 0.01f;
-					v2X = v2X - 0.01f;
-					v3X = v3X - 0.01f;
+
 				}
 					break;
 
 					//if right
 				case SDLK_RIGHT:
 				{
-					v1X = v1X + 0.01f;
-					v2X = v2X + 0.01f;
-					v3X = v3X + 0.01f;
+					
 				}
 					break;
 
 					//if up
 				case SDLK_UP:
 				{
-					v1Y = v1Y + 0.01f;
-					v2Y = v2Y + 0.01f;
-					v3Y = v3Y + 0.01f;
+					
 				}
 					break;
 
 					//if down
 				case SDLK_DOWN:
 				{
-					v1Y = v1Y - 0.01f;
-					v2Y = v2Y - 0.01f;
-					v3Y = v3Y - 0.01f;
+					
 				}
 					break;
 
