@@ -174,6 +174,9 @@ void Render()
 		//reset using identity matrix
 		glLoadIdentity();
 
+		//2dspace to 3dspace
+		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
+
 		//translate
 		glTranslatef(-1.25f, -1.25f, -6.0f);
 		//look at this for 2D camera
@@ -188,6 +191,9 @@ void Render()
 		//triangle 2
 		//reset using identity matrix
 		glLoadIdentity();
+
+		//2dspace to 3dspace
+		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
 		//translate
 		glTranslatef(1.25f, 1.25f, -6.0f);
