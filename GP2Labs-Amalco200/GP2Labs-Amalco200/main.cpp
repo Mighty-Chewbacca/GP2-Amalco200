@@ -11,8 +11,17 @@
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
 
+//maths headers
+#include <glm/glm.hpp>
+using glm::mat4;
+using glm::vec3;
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 //includes for custom headers made by me
 #include "Vertex.h"
+#include "shader.h"
 
 //Global variables here
 //pointer to SDL windows
@@ -36,6 +45,13 @@ float xPos = 0, yPos = 0, zPos = -5;
 
 float xPos2 = 1.8f, yPos2 = 1.255f, zPos2 = -5;
 
+//matrices
+mat4 viewMatrix;
+mat4 projMatrix;
+mat4 worldMatrix;
+
+//holds shader program
+GLuint shaderProgram = 0;
 
 // vertex buffer object variable
 GLuint triangleVBO;
@@ -124,6 +140,8 @@ void InitWindow(int width, int height, bool fullscreen)
 void CleanUp()
 {
 	//clean geometry stuff
+	glDeleteProgram(shaderProgram);
+
 	glDeleteBuffers(1, &triangleEBO);
 	glDeleteBuffers(1, &triangleVBO);
 
@@ -135,6 +153,11 @@ void CleanUp()
 //initialise opengl
 void initOpenGL()
 {
+	//ask for version 3.2 of gl
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 	glcontext = SDL_GL_CreateContext(window);
 	//something went wrong creating the context, if it is still null
 	if (!glcontext)
@@ -154,6 +177,8 @@ void initOpenGL()
 	glDepthFunc(GL_LEQUAL);
 	//turn on prespective correction
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	glewExperimental = GL_TRUE;
 
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
@@ -180,19 +205,6 @@ void setViewport(int width, int height)
 
 	//setup viewport
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-
-	//change to project matrix mode
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	//calculate perpective matrix using glu lib functions
-	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
-
-	//switch to model view
-	glMatrixMode(GL_MODELVIEW);
-
-	//reset using identity matrix
-	glLoadIdentity();
 }
 
 void InitGeometry()
@@ -241,12 +253,6 @@ void ChangeAxis(int newAxis)
 	}
 }
 
-//change the command the user is using
-void ChangeCommands()
-{
-
-}
-
 
 //function to draw shizzle
 void Render()
@@ -261,50 +267,18 @@ void Render()
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
 
-	//the 3 parameter is now filled out, the pipeline needs to know the size of each vertex
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
+	glUseProgram(shaderProgram);
 
-	//the last parameter basically says that the colours starts 3 floats into each element of the array
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void**)(3 * sizeof(float)));
+	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
+	mat4 MVP = projMatrix * viewMatrix * worldMatrix;
+	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
-	//establish array contains vertices and normals colours
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	//tell the shader that 0 is the position element
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	//switch to model view
-	glMatrixMode(GL_MODELVIEW);
-
-	//triangle 1
-		//reset using identity matrix
-		glLoadIdentity();
-
-		//2dspace to 3dspace
-		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
-
-		//translate
-		glTranslatef(xPos, yPos, zPos);
-		//look at this for 2D camera
-		//glOrtho() or gluOrtho2D
-
-		//Look at the 3D
-		//gluLookAt
-
-		//actually draw the triangle
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
-		//triangle 2
-		//reset using identity matrix
-		glLoadIdentity();
-
-		//2dspace to 3dspace
-		gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
-
-		//translate
-		glTranslatef(xPos2, yPos2, zPos2);
-
-		//actually draw the triangle
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
+	//actually draw the triangle
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
@@ -313,7 +287,34 @@ void Render()
 //function to update game state
 void Update()
 {
+	projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
+	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f 1.0f, 0.0f));
+
+	worldMatrix = glm::translate(mat4(1.0f), vec3(0.0f 0.0f, 0.0f));
+}
+
+void createShader()
+{
+	GLuint vertexShaderProgram = 0;
+	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
+	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
+
+	GLuint fragmentShaderProgram = 0;
+	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
+	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
+
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShaderProgram);
+	glAttachShader(shaderProgram, fragmentShaderProgram);
+	glLinkProgram(shaderProgram);
+	checkForLinkErrors(shaderProgram);
+
+	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
+
+	//no we can delete them
+	glDeleteShader(vertexShaderProgram);
+	glDeleteShader(fragmentShaderProgram);
 }
 
 //Main method - program entry point
@@ -334,6 +335,8 @@ int main(int argc, char*arg[])
 
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	createShader();
 
 	SDL_Event event;
 
