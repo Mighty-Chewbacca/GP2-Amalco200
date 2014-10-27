@@ -1,7 +1,7 @@
 #include "Shader.h"
 
 #ifdef _DEBUG && WIN32
-const std::string ASSET_PATH = "assets";
+const std::string ASSET_PATH = "../assets";
 #else
 const std::string ASSET_PATH = "assets";
 #endif
