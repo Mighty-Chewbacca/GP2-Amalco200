@@ -71,27 +71,29 @@ GLuint triangleEBO;
 GLuint VAO;
 
 //triangle data contains xyz
-float triangleData[] = {
-	//Front
-	-0.5f, 0.5f, 0.5f,// Top Left
+Vertex triangleData[] = {
+#pragma region Front_face
+	//Front face
+		{ vec3{ -0.5f, 0.5f, 0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
 
-	-0.5f, -0.5f, 0.5f,// Bottom Left
+		{ vec3{ -0.5f, -0.5f, 0.5f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
-	0.5f, -0.5f, 0.5f, //Bottom Right
+		{ vec3{ 0.5f, -0.5f, 0.5f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
 
-	0.5f, 0.5f, 0.5f,// Top Right
+		{ vec3{ 0.5f, 0.5f, 0.5f }, vec4{ 1.0f, 1.0f, 1.0f, 1.0f } },// Top Right
+#pragma endregion
 
+#pragma region Back_face
+		//back face
+		{ vec3{ -0.5f, 0.5f, -0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
 
-	//back
-	-0.5f, 0.5f, -0.5f,// Top Left
+		{ vec3{ -0.5f, -0.5f, -0.5f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
-	-0.5f, -0.5f, -0.5f,// Bottom Left
+		{ vec3{ 0.5f, -0.5f, -0.5f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
 
-	0.5f, -0.5f, -0.5f, //Bottom Right
-
-	0.5f, 0.5f, -0.5f,// Top Right
-
-};
+		{ vec3{ 0.5f, 0.5f, -0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Right
+#pragma endregion
+};	
 
 
 GLuint indices[] = {
@@ -280,6 +282,8 @@ void Render()
 	//tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**) sizeof(vec3));
 
 	//actually draw the triangle
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
