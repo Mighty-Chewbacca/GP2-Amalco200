@@ -6,6 +6,7 @@
 
 //header for sdl2 functionality
 #include <SDL.h>
+#include <SDL_Image.h>
 
 //includes for opengl headers
 #include <SDL_opengl.h>
@@ -328,6 +329,14 @@ int main(int argc, char*arg[])
 	{
 		std::cout << "ERROR SDL_Init" << SDL_GetError() << std::endl;
 		return-1;
+	}
+
+	int imageInitFlags = IMG_INIT_JPG | IMG_INIT_PNG;
+	int returnInitFlags = IMG_Init(imageInitFlags);
+	if (((returnInitFlags)&(imageInitFlags)) != imageInitFlags)
+	{
+		std::cout << "ERROR SDL_Image Init" << IMG_GetError() << std::endl;
+		//handle error here
 	}
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false);
