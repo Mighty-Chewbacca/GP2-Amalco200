@@ -19,6 +19,14 @@ using glm::vec3;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#ifdef _DEBUG && WIN32
+const std::string ASSET_PATH = "assets";
+const std::string SHADER_PATH = "/shaders";
+#else
+const std::string ASSET_PATH = "/assets";
+const std::string SHADER_PATH = "/shaders";
+#endif
+
 //includes for custom headers made by me
 #include "Vertex.h"
 #include "shader.h"
@@ -59,40 +67,31 @@ GLuint triangleVBO;
 //element buffer object
 GLuint triangleEBO;
 
-//triangle data now contains both rgba and xyz
-Vertex triangleData[] = {
+GLuint VAO;
 
-#pragma region Front_face
-	//Front face
-		{ -0.5f, 0.5f, 0.5f,
-		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
+//triangle data contains xyz
+float triangleData[] = {
+	//Front
+	-0.5f, 0.5f, 0.5f,// Top Left
 
-		{ -0.5f, -0.5f, 0.5f,
-		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+	-0.5f, -0.5f, 0.5f,// Bottom Left
 
-		{ 0.5f, -0.5f, 0.5f,
-		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
+	0.5f, -0.5f, 0.5f, //Bottom Right
 
-		{ 0.5f, 0.5f, 0.5f,
-		1.0f, 1.0f, 1.0f, 1.0f },// Top Right
-#pragma endregion
+	0.5f, 0.5f, 0.5f,// Top Right
 
-#pragma region Back_face
-		//back face
-		{ -0.5f, 0.5f, -0.5f,
-		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
 
-		{ -0.5f, -0.5f, -0.5f,
-		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+	//back
+	-0.5f, 0.5f, -0.5f,// Top Left
 
-		{ 0.5f, -0.5f, -0.5f,
-		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
+	-0.5f, -0.5f, -0.5f,// Bottom Left
 
-		{ 0.5f, 0.5f, -0.5f,
-		1.0f, 0.0f, 1.0f, 1.0f },// Top Right
-#pragma endregion
+	0.5f, -0.5f, -0.5f, //Bottom Right
+
+	0.5f, 0.5f, -0.5f,// Top Right
 
 };
+
 
 GLuint indices[] = {
 
@@ -102,16 +101,16 @@ GLuint indices[] = {
 	0, 1, 2, 0, 3, 2,
 
 	//left
-	4, 5, 1, 4, 0, 1,
+	4, 5, 1, 4, 1, 0,
 
 	//right
 	3, 7, 2, 7, 6, 2,
 
 	//bottom
-	1, 5, 2, 6, 2, 5,
+	1, 5, 2, 6, 2, 1,
 
 	//top
-	4, 7, 0, 0, 3, 7,
+	5, 0, 7, 5, 7, 3,
 
 	//back
 	4, 5, 6, 4, 7, 6
@@ -144,6 +143,7 @@ void CleanUp()
 
 	glDeleteBuffers(1, &triangleEBO);
 	glDeleteBuffers(1, &triangleVBO);
+	glDeleteVertexArrays(1, &VAO);
 
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
@@ -209,6 +209,8 @@ void setViewport(int width, int height)
 
 void InitGeometry()
 {
+	glGenVertexArrays(1, &VAO);
+
 	//create buffer
 	glGenBuffers(1, &triangleVBO);
 
@@ -264,6 +266,7 @@ void Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
 

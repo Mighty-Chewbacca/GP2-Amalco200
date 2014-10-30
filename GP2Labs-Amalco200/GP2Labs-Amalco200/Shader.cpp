@@ -1,13 +1,5 @@
 #include "Shader.h"
 
-#ifdef _DEBUG && WIN32
-const std::string ASSET_PATH = "../assets";
-#else
-const std::string ASSET_PATH = "assets";
-#endif
-
-const std::string SHADER_PATH = "/shaders";
-
 
 //load it from a memory buffer
 GLuint loadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType)
