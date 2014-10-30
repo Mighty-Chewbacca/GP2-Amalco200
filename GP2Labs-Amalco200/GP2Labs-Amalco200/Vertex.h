@@ -3,7 +3,13 @@
 
 #endif
 
+#include <glm/glm.hpp>
+using glm::vec4;
+using glm::vec3;
+using glm::vec2;
+
 struct  Vertex
 {
-	float x, y, z;
+	vec3 position;
+	vec4 colours;
 };
