@@ -23,14 +23,17 @@ using glm::vec3;
 #ifdef _DEBUG && WIN32
 const std::string ASSET_PATH = "assets";
 const std::string SHADER_PATH = "/shaders";
+const std::string TEXTURE_PATH = "/textures";
 #else
 const std::string ASSET_PATH = "/assets";
 const std::string SHADER_PATH = "/shaders";
+const std::string TEXTURE_PATH = "/textures";
 #endif
 
 //includes for custom headers made by me
 #include "Vertex.h"
 #include "shader.h"
+#include "Texture.h"
 
 //Global variables here
 //pointer to SDL windows
@@ -68,30 +71,34 @@ GLuint triangleVBO;
 //element buffer object
 GLuint triangleEBO;
 
+//vertex array object
 GLuint VAO;
+
+// texture int (ID???)
+GLuint texture = 0;
 
 //triangle data contains xyz
 Vertex triangleData[] = {
 #pragma region Front_face
 	//Front face
-		{ vec3{ -0.5f, 0.5f, 0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
+		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{0.0f, 0.0f}, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
 
-		{ vec3{ -0.5f, -0.5f, 0.5f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
+		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 2.0f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
-		{ vec3{ 0.5f, -0.5f, 0.5f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
+		{ vec3{ 0.5f, -0.5f, 0.5f }, vec2{ 2.0f, 2.0f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
 
-		{ vec3{ 0.5f, 0.5f, 0.5f }, vec4{ 1.0f, 1.0f, 1.0f, 1.0f } },// Top Right
+		{ vec3{ 0.5f, 0.5f, 0.5f }, vec2{ 2.0f, 0.0f }, vec4{ 1.0f, 1.0f, 1.0f, 1.0f } },// Top Right
 #pragma endregion
 
 #pragma region Back_face
 		//back face
-		{ vec3{ -0.5f, 0.5f, -0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
+		{ vec3{ -0.5f, 0.5f, -0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
 
-		{ vec3{ -0.5f, -0.5f, -0.5f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
+		{ vec3{ -0.5f, -0.5f, -0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
-		{ vec3{ 0.5f, -0.5f, -0.5f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
+		{ vec3{ 0.5f, -0.5f, -0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
 
-		{ vec3{ 0.5f, 0.5f, -0.5f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Right
+		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Right
 #pragma endregion
 };	
 
@@ -141,6 +148,9 @@ void InitWindow(int width, int height, bool fullscreen)
 //used to clean up once we exit app
 void CleanUp()
 {
+	// delete the texture
+	glDeleteTextures(1, &texture);
+
 	//clean geometry stuff
 	glDeleteProgram(shaderProgram);
 
@@ -258,7 +268,6 @@ void ChangeAxis(int newAxis)
 	}
 }
 
-
 //function to draw shizzle
 void Render()
 {
@@ -275,15 +284,26 @@ void Render()
 
 	glUseProgram(shaderProgram);
 
+	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(texture0Location, 0);
+
 	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
 	mat4 MVP = projMatrix * viewMatrix * worldMatrix;
 	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
-	//tell the shader that 0 is the position element
+	//tell shader that first element of structure is vertex pos
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+
+	//tell shader that first element of structure is vertex texture coordinates
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**) sizeof(vec3));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void**)sizeof(vec3));
+
+	//tell shader that first element of structure is vertex colour
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void**)(sizeof(vec3) + sizeof(vec2)));
 
 	//actually draw the triangle
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
@@ -305,11 +325,11 @@ void Update()
 void createShader()
 {
 	GLuint vertexShaderProgram = 0;
-	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
+	std::string vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
 	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
 
 	GLuint fragmentShaderProgram = 0;
-	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
+	std::string fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
 	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
 
 	shaderProgram = glCreateProgram();
@@ -319,10 +339,25 @@ void createShader()
 	checkForLinkErrors(shaderProgram);
 
 	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
+	glBindAttribLocation(shaderProgram, 1, "vertexTexCoords");
+	glBindAttribLocation(shaderProgram, 2, "vertexColour");
 
 	//no we can delete them
 	glDeleteShader(vertexShaderProgram);
 	glDeleteShader(fragmentShaderProgram);
+}
+
+void createTexture()
+{
+	std::string texturePath = ASSET_PATH + TEXTURE_PATH + "/texImage.png";
+
+	texture = loadTextureFromFile(texturePath);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 }
 
 //Main method - program entry point
@@ -348,6 +383,7 @@ int main(int argc, char*arg[])
 	//call our init opengl function
 	initOpenGL();
 	InitGeometry();
+	createTexture();
 
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
