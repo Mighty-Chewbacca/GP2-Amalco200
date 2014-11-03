@@ -11,7 +11,7 @@ GLuint loadTextureFromFile(const std::string& filename)
 		std::cout << "Can't load image" << filename << " " << IMG_GetError();
 	}
 
-	GLint nOfColors = imageSurface->format->BytesPerPixel;
+GLint nOfColors = imageSurface->format->BytesPerPixel;
 	GLenum textureFormat = GL_RGB;
 	if (nOfColors == 4) //this contains the alpha channel
 	{

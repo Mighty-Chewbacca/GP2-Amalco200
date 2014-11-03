@@ -81,24 +81,24 @@ GLuint texture = 0;
 Vertex triangleData[] = {
 #pragma region Front_face
 	//Front face
-		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{0.0f, 0.0f}, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
+		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{0.0f, 0.0f}, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Left
 
-		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 2.0f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
+		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
-		{ vec3{ 0.5f, -0.5f, 0.5f }, vec2{ 2.0f, 2.0f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
+		{ vec3{ 0.5f, -0.5f, 0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } }, //Bottom Right
 
-		{ vec3{ 0.5f, 0.5f, 0.5f }, vec2{ 2.0f, 0.0f }, vec4{ 1.0f, 1.0f, 1.0f, 1.0f } },// Top Right
+		{ vec3{ 0.5f, 0.5f, 0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Right
 #pragma endregion
 
 #pragma region Back_face
 		//back face
-		{ vec3{ -0.5f, 0.5f, -0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Left
+		{ vec3{ -0.5f, 0.5f, -0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } },// Top Left
 
-		{ vec3{ -0.5f, -0.5f, -0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 1.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
+		{ vec3{ -0.5f, -0.5f, -0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Bottom Left
 
-		{ vec3{ 0.5f, -0.5f, -0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 1.0f, 1.0f, 1.0f } }, //Bottom Right
+		{ vec3{ 0.5f, -0.5f, -0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 0.0f, 1.0f } }, //Bottom Right
 
-		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 1.0f, 0.0f, 1.0f, 1.0f } },// Top Right
+		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Top Right
 #pragma endregion
 };	
 
@@ -111,16 +111,16 @@ GLuint indices[] = {
 	0, 1, 2, 0, 3, 2,
 
 	//left
-	4, 5, 1, 4, 0, 1,
+	4, 5, 1, 4, 1, 0,
 
 	//right
 	3, 7, 2, 7, 6, 2,
 
 	//bottom
-	1, 5, 2, 6, 2, 5,
+	1, 5, 2, 6, 2, 1,
 
 	//top
-	4, 7, 0, 0, 3, 7,
+	5, 0, 7, 5, 7, 3,
 
 	//back
 	4, 5, 6, 4, 7, 6
@@ -319,7 +319,7 @@ void Update()
 
 	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
-	worldMatrix = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 0.0f));
+	worldMatrix = glm::translate(mat4(1.0f), vec3(-4.0f, -2.0f, 0.0f));
 }
 
 void createShader()
@@ -353,10 +353,6 @@ void createTexture()
 
 	texture = loadTextureFromFile(texturePath);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 }
 
