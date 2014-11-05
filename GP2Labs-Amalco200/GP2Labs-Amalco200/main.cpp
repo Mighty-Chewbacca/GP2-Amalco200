@@ -81,7 +81,7 @@ GLuint texture = 0;
 Vertex triangleData[] = {
 #pragma region Front_face
 	//Front face
-		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{0.0f, 0.0f}, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Left
+		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Left
 
 		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
 
@@ -100,7 +100,7 @@ Vertex triangleData[] = {
 
 		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Top Right
 #pragma endregion
-};	
+};
 
 
 GLuint indices[] = {
@@ -296,14 +296,12 @@ void Render()
 	//tell shader that first element of structure is vertex pos
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
-
 	//tell shader that first element of structure is vertex texture coordinates
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void**)sizeof(vec3));
-
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
 	//tell shader that first element of structure is vertex colour
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void**)(sizeof(vec3) + sizeof(vec2)));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec2)));
 
 	//actually draw the triangle
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
@@ -446,20 +444,6 @@ int main(int argc, char*arg[])
 					//if up
 				case SDLK_UP:
 				{
-					if (xAxis)
-					{
-
-					}
-
-					if (yAxis)
-					{
-
-					}
-
-					if (zAxis)
-					{
-
-					}
 
 				}
 					break;
@@ -467,41 +451,7 @@ int main(int argc, char*arg[])
 					//if down
 				case SDLK_DOWN:
 				{
-					if (xAxis)
-					{
 
-					}
-
-					if (yAxis)
-					{
-
-					}
-
-					if (zAxis)
-					{
-
-					}
-				}
-					break;
-
-					//if x is pressed
-				case SDLK_x:
-				{
-					ChangeAxis(0);
-				}
-					break;
-
-					//if y is pressed
-				case SDLK_y:
-				{
-					ChangeAxis(1);
-				}
-					break;
-
-					//if z is pressed
-				case SDLK_z:
-				{
-					ChangeAxis(2);
 				}
 					break;
 				}
