@@ -7,6 +7,7 @@
 //header for sdl2 functionality
 #include <SDL.h>
 #include <SDL_Image.h>
+#include <SDL_ttf.h>
 
 //includes for opengl headers
 #include <SDL_opengl.h>
@@ -24,10 +25,12 @@ using glm::vec3;
 const std::string ASSET_PATH = "assets";
 const std::string SHADER_PATH = "/shaders";
 const std::string TEXTURE_PATH = "/textures";
+const std::string FONT_PATH = "/fonts";
 #else
 const std::string ASSET_PATH = "/assets";
 const std::string SHADER_PATH = "/shaders";
 const std::string TEXTURE_PATH = "/textures";
+const std::string FONT_PATH = "/fonts";
 #endif
 
 //includes for custom headers made by me
@@ -76,6 +79,8 @@ GLuint VAO;
 
 // texture int (ID???)
 GLuint texture = 0;
+
+GLuint fontTexture;
 
 //triangle data contains xyz
 Vertex triangleData[] = {
@@ -150,6 +155,7 @@ void CleanUp()
 {
 	// delete the texture
 	glDeleteTextures(1, &texture);
+	glDeleteTextures(1, &fontTexture);
 
 	//clean geometry stuff
 	glDeleteProgram(shaderProgram);
@@ -277,6 +283,10 @@ void Render()
 	//clear colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//enable alpha blending for texty stufs
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
@@ -286,7 +296,7 @@ void Render()
 
 	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, fontTexture);
 	glUniform1i(texture0Location, 0);
 
 	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
@@ -340,7 +350,7 @@ void createShader()
 	glBindAttribLocation(shaderProgram, 1, "vertexTexCoords");
 	glBindAttribLocation(shaderProgram, 2, "vertexColour");
 
-	//no we can delete them
+	//now we can delete them
 	glDeleteShader(vertexShaderProgram);
 	glDeleteShader(fragmentShaderProgram);
 }
@@ -354,6 +364,15 @@ void createTexture()
 
 }
 
+void createFontTexture()
+{
+	std::string fontPath = ASSET_PATH + FONT_PATH + "/OratorStd.otf";
+
+	fontTexture = loadTextureFromFont(fontPath, 12, "I'm Batman");
+
+
+}
+
 //Main method - program entry point
 int main(int argc, char*arg[])
 {
@@ -362,6 +381,12 @@ int main(int argc, char*arg[])
 	{
 		std::cout << "ERROR SDL_Init" << SDL_GetError() << std::endl;
 		return-1;
+	}
+
+	//init sdl ttf for fonts
+	if (TTF_Init() == -1)
+	{
+		std::cout << "ERROr in ttf init: " << TTF_GetError();
 	}
 
 	int imageInitFlags = IMG_INIT_JPG | IMG_INIT_PNG;
@@ -378,6 +403,7 @@ int main(int argc, char*arg[])
 	initOpenGL();
 	InitGeometry();
 	createTexture();
+	createFontTexture();
 
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
