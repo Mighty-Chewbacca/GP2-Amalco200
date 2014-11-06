@@ -1,3 +1,7 @@
+#ifndef COMPONENT_H
+#define COMPONENT_H
+#endif
+
 #include <string>
 
 class Component
