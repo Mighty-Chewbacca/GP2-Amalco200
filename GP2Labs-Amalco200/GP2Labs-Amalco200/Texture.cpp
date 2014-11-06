@@ -1,4 +1,4 @@
-#include "Texture.h"
+ #include "Texture.h"
 
 GLuint loadTextureFromFile(const std::string& filename)
 {

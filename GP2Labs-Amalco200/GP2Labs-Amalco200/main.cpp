@@ -111,6 +111,7 @@ Vertex triangleData[] = {
 GLuint indices[] = {
 
 	//personal notes, every 3 numbers relates to 1 triangle, they connect to each other, the number relates to the number of the vertice and not the amount of times it is touched
+	//this renders the cube incorrectly i believe, not sure why, have checked the attribarrays and they look okay
 
 	//front
 	0, 1, 2, 0, 3, 2,
@@ -130,6 +131,32 @@ GLuint indices[] = {
 	//back
 	4, 5, 6, 4, 7, 6
 };
+
+//other indices are below \/ \/
+
+//GLuint indices[] = {
+//
+//	//personal notes, every 3 numbers relates to 1 triangle, they connect to each other, the number relates to the number of the vertice and not the amount of times it is touched
+//	//this appears to render the cube properly but not with the textures on the outside
+//
+//	//front
+//	0, 1, 2, 0, 3, 2,
+//
+//	//left
+//	4, 5, 1, 4, 0, 1,
+//
+//	//right
+//	3, 7, 2, 7, 6, 2,
+//
+//	//bottom
+//	1, 5, 2, 6, 2, 5,
+//
+//	//top
+//	4, 7, 0, 0, 3, 7,
+//
+//	//back
+//	4, 5, 6, 4, 7, 6
+//};
 
 
 
@@ -287,7 +314,6 @@ void Render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//make the new vbo active, repeat here as a sanity check(may have changed since initialisation)
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
@@ -325,12 +351,12 @@ void Update()
 {
 	//this one for 3d
 	//projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-	//this one for 2d
+	//this one for 2d font stuff
 	projMatrix = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, 0.1f, 100.0f);
 
 	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
-	worldMatrix = glm::translate(mat4(1.0f), vec3(-4.0f, -2.0f, 0.0f));
+	worldMatrix = glm::translate(mat4(1.0f), vec3(-4.0f, -3.0f, 0.0f));
 }
 
 void createShader()
@@ -371,7 +397,7 @@ void createFontTexture()
 {
 	std::string fontPath = ASSET_PATH + FONT_PATH + "/OratorStd.otf";
 
-	fontTexture = loadTextureFromFont(fontPath, 12, "I'm Batman");
+	fontTexture = loadTextureFromFont(fontPath, 20, "I'm Batman");
 
 
 }
@@ -450,8 +476,9 @@ int main(int argc, char*arg[])
 	initOpenGL();
 	InitGeometry();
 	createTexture();
-	createFontTexture();
 
+	//for 2d font thing
+	createFontTexture();
 	initGeometryFromTexture(fontTexture);
 
 	//set the wee viewport
