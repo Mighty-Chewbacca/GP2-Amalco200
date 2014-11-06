@@ -10,15 +10,15 @@ public:
 	virtual ~Component();
 
 	//public virtual functions
-	virtual void Init();
-	virtual void Update();
-	virtual void Render();
-	virtual void Destroy();
+	virtual void init();
+	virtual void update();
+	virtual void render();
+	virtual void destroy();
 
 	//public non virtual functions
-	const std::string& GetType();
-	void ToggleActive();
-	bool IsActive();
+	const std::string& getType();
+	void toggleActive();
+	bool isActive();
 
 protected:
 
