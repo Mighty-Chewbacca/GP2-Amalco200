@@ -132,32 +132,6 @@ GLuint indices[] = {
 	4, 5, 6, 4, 7, 6
 };
 
-//other indices are below \/ \/
-
-//GLuint indices[] = {
-//
-//	//personal notes, every 3 numbers relates to 1 triangle, they connect to each other, the number relates to the number of the vertice and not the amount of times it is touched
-//	//this appears to render the cube properly but not with the textures on the outside
-//
-//	//front
-//	0, 1, 2, 0, 3, 2,
-//
-//	//left
-//	4, 5, 1, 4, 0, 1,
-//
-//	//right
-//	3, 7, 2, 7, 6, 2,
-//
-//	//bottom
-//	1, 5, 2, 6, 2, 5,
-//
-//	//top
-//	4, 7, 0, 0, 3, 7,
-//
-//	//back
-//	4, 5, 6, 4, 7, 6
-//};
-
 
 
 //sdl gl context
@@ -322,7 +296,7 @@ void Render()
 
 	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fontTexture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(texture0Location, 0);
 
 	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
@@ -350,9 +324,9 @@ void Render()
 void Update()
 {
 	//this one for 3d
-	//projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	//this one for 2d font stuff
-	projMatrix = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, 0.1f, 100.0f);
+	//projMatrix = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, 0.1f, 100.0f);
 
 	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
@@ -478,8 +452,8 @@ int main(int argc, char*arg[])
 	createTexture();
 
 	//for 2d font thing
-	createFontTexture();
-	initGeometryFromTexture(fontTexture);
+	//createFontTexture();
+	//initGeometryFromTexture(fontTexture);
 
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
