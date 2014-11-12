@@ -159,8 +159,6 @@ void CleanUp()
 	glDeleteTextures(1, &fontTexture);
 
 	//clean geometry stuff
-	glDeleteProgram(shaderProgram);
-
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -204,7 +202,7 @@ void initOpenGL()
 	}
 }
 
-void initGeometry()
+void InitGeometry()
 {
 
 	//copy vertex data into buffer
@@ -271,8 +269,6 @@ void Render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glUseProgram(shaderProgram);
-
 	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -304,27 +300,7 @@ void Update()
 
 void createShader()
 {
-	GLuint vertexShaderProgram = 0;
-	std::string vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
-	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
 
-	GLuint fragmentShaderProgram = 0;
-	std::string fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
-	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
-
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShaderProgram);
-	glAttachShader(shaderProgram, fragmentShaderProgram);
-	glLinkProgram(shaderProgram);
-	checkForLinkErrors(shaderProgram);
-
-	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
-	glBindAttribLocation(shaderProgram, 1, "vertexTexCoords");
-	glBindAttribLocation(shaderProgram, 2, "vertexColour");
-
-	//now we can delete them
-	glDeleteShader(vertexShaderProgram);
-	glDeleteShader(fragmentShaderProgram);
 }
 
 void createTexture()
