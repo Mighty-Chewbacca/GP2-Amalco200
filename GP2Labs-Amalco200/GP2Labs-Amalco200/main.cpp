@@ -161,10 +161,6 @@ void CleanUp()
 	//clean geometry stuff
 	glDeleteProgram(shaderProgram);
 
-	glDeleteBuffers(1, &triangleEBO);
-	glDeleteBuffers(1, &triangleVBO);
-	glDeleteVertexArrays(1, &VAO);
-
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -208,6 +204,16 @@ void initOpenGL()
 	}
 }
 
+void initGeometry()
+{
+
+	//copy vertex data into buffer
+	
+
+	//copy index data to ebo
+	
+}
+
 //function to set/reset viewport
 void setViewport(int width, int height)
 {
@@ -225,29 +231,6 @@ void setViewport(int width, int height)
 
 	//setup viewport
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-}
-
-void InitGeometry()
-{
-	glGenVertexArrays(1, &VAO);
-
-	//create buffer
-	glGenBuffers(1, &triangleVBO);
-
-	//make vbo active
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-
-	//copy vertex data into buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData), triangleData, GL_STATIC_DRAW);
-
-	//create element buffer
-	glGenBuffers(1, &triangleEBO);
-
-	//make active
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
-
-	//copy index data to ebo
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 //method to change the axis the user is affecting
@@ -288,10 +271,6 @@ void Render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
-
 	glUseProgram(shaderProgram);
 
 	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
@@ -302,16 +281,6 @@ void Render()
 	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
 	mat4 MVP = projMatrix * viewMatrix * worldMatrix;
 	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
-	//tell shader that first element of structure is vertex pos
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
-	//tell shader that first element of structure is vertex texture coordinates
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
-	//tell shader that first element of structure is vertex colour
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec2)));
 
 	//actually draw the triangle
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
