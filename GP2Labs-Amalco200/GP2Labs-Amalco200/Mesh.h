@@ -24,9 +24,7 @@ using glm::vec3;
 
 #include "Vertex.h"
 
-#endif
-
-class Mesh :Component
+class Mesh :public Component
 {
 public:
 	Mesh();
@@ -53,3 +51,5 @@ private:
 
 
 };
+
+#endif

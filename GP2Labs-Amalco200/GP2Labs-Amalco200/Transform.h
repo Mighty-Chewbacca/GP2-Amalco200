@@ -11,9 +11,7 @@ using glm::vec3;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#endif
-
-class Transform :Component
+class Transform :public Component
 {
 public:
 	//constructor
@@ -31,9 +29,9 @@ public:
 	mat4 getModel();
 
 	//set methods
-	void setPosition(vec3 position);
-	void setRotation(vec3 rotation);
-	void setScale(vec3 scale);
+	void setPosition(float x, float y, float z);
+	void setRotation(float x, float y, float z);
+	void setScale(float x, float y, float z);
 
 protected:
 
@@ -44,3 +42,5 @@ private:
 	mat4 m_Model;
 
 };
+
+#endif

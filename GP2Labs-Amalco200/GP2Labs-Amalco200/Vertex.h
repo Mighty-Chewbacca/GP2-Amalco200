@@ -1,7 +1,6 @@
 #ifndef Vertex_h
 #define Vertex_h
 
-#endif
 
 #include <glm/glm.hpp>
 using glm::vec4;
@@ -14,3 +13,5 @@ struct  Vertex
 	vec2 texCoords;
 	vec4 colours;
 };
+
+#endif

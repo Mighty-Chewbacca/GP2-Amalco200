@@ -55,17 +55,17 @@ mat4 Transform::getModel()
 
 //set functions
 
-void Transform::setPosition(vec3 position)
+void Transform::setPosition(float x, float y, float z)
 {
-	m_Position = position;
+	m_Position = vec3(x, y, z);
 }
 
-void Transform::setRotation(vec3 rotation)
+void Transform::setRotation(float x, float y, float z)
 {
-	m_Rotation = rotation;
+	m_Rotation = vec3(x, y, z);
 }
 
-void Transform::setScale(vec3 scale)
+void Transform::setScale(float x, float y, float z)
 {
-	m_Scale = scale;
+	m_Scale = vec3 (x, y, z);
 }

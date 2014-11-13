@@ -8,8 +8,6 @@
 #include <fstream>
 #include <string>
 
-#endif
-
 enum SHADER_TYPE
 {
 	VERTEX_SHADER = GL_VERTEX_SHADER,
@@ -23,3 +21,6 @@ GLuint loadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType);
 bool checkForCompilerErrors(GLuint shaderProgram);
 
 bool checkForLinkErrors(GLuint program);
+
+
+#endif

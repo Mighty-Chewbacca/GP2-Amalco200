@@ -3,7 +3,7 @@
 
 #include <string>
 
-#endif
+class GameObject;
 
 class Component
 {
@@ -25,10 +25,17 @@ public:
 	void toggleActive();
 	bool isActive();
 
+	GameObject * getParent();
+	void setParent(GameObject *parent);
+
 protected:
 
 	std::string m_Type;
 	bool m_Active;
 
+	GameObject * m_Parent;
+
 private:
 };
+
+#endif

@@ -26,9 +26,8 @@ using glm::vec3;
 
 #include <gl\GLU.h>
 #include <SDL_opengl.h>
-#endif
 
-class Material :Component
+class Material :public Component
 {
 public:
 
@@ -48,3 +47,5 @@ private:
 	GLuint m_ShaderProgram;
 
 };
+
+#endif

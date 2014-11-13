@@ -21,6 +21,8 @@ using glm::vec3;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
+
 #ifdef _DEBUG && WIN32
 const std::string ASSET_PATH = "assets";
 const std::string SHADER_PATH = "/shaders";
@@ -37,6 +39,11 @@ const std::string FONT_PATH = "/fonts";
 #include "Vertex.h"
 #include "shader.h"
 #include "Texture.h"
+#include "GameObject.h"
+#include "Transform.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 //Global variables here
 //pointer to SDL windows
@@ -81,6 +88,11 @@ GLuint VAO;
 GLuint texture = 0;
 
 GLuint fontTexture;
+
+
+std::vector<GameObject*> displayList;
+
+GameObject * mainCamera;
 
 //triangle data contains xyz
 Vertex triangleData[] = {
@@ -133,9 +145,16 @@ GLuint indices[] = {
 };
 
 
-
 //sdl gl context
 SDL_GLContext glcontext = NULL;
+
+void CheckForErrors()
+{
+	GLenum error;
+	do{
+		error = glGetError();
+	} while (error != GL_NO_ERROR);
+}
 
 //Global functions
 void InitWindow(int width, int height, bool fullscreen)
@@ -154,13 +173,32 @@ void InitWindow(int width, int height, bool fullscreen)
 //used to clean up once we exit app
 void CleanUp()
 {
-	// delete the texture
-	glDeleteTextures(1, &texture);
-	glDeleteTextures(1, &fontTexture);
+	//// delete the texture
+	//glDeleteTextures(1, &texture);
+	//glDeleteTextures(1, &fontTexture);
+
+	auto iter = displayList.begin();
+	while (iter != displayList.end())
+	{
+		(*iter)->destroy();
+		if ((*iter))
+		{
+			delete (*iter);
+			(*iter) = NULL;
+			iter = displayList.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+	displayList.clear();
 
 	//clean geometry stuff
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
+	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -202,21 +240,11 @@ void initOpenGL()
 	}
 }
 
-void InitGeometry()
-{
-
-	//copy vertex data into buffer
-	
-
-	//copy index data to ebo
-	
-}
-
 //function to set/reset viewport
 void setViewport(int width, int height)
 {
-	//screen ratio
-	GLfloat ratio;
+	////screen ratio
+	//GLfloat ratio;
 
 	//make sure height is always above 0
 	if (height == 0)
@@ -224,8 +252,8 @@ void setViewport(int width, int height)
 		height = 1;
 	}
 
-	//calculate screen ratio
-	ratio = (GLfloat)width / (GLfloat)height;
+	////calculate screen ratio
+	//ratio = (GLfloat)width / (GLfloat)height;
 
 	//setup viewport
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
@@ -256,6 +284,48 @@ void ChangeAxis(int newAxis)
 	}
 }
 
+void Initialise()
+{
+	mainCamera = new GameObject();
+	Transform * transform = new Transform();
+	transform->setPosition(0.0f, 0.0f, 10.0f);
+	mainCamera->setTransform(transform);
+
+	Camera * camera = new Camera();
+	camera->setAspectRatio((float)(WINDOW_WIDTH / WINDOW_HEIGHT));
+	camera->setFOV(45.0f);
+	camera->setNearClip(0.1f);
+	camera->setFarClip(1000.0f);
+
+	mainCamera->setCamera(camera);
+	displayList.push_back(mainCamera);
+
+	GameObject * cube = new GameObject();
+	cube->setName("Cube");
+
+	Transform *cubetransform = new Transform();
+	cubetransform->setPosition(0.0f, 0.0f, 2.0f);
+	cube->setTransform(cubetransform);
+
+	Material * material = new Material();
+	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
+	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
+	material->loadShader(vsPath, fsPath);
+	cube->setMaterial(material);
+
+	Mesh * mesh = new Mesh();
+	cube->setMesh(mesh);
+
+	displayList.push_back(cube);
+
+	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
+	{
+		(*iter)->init();
+	}
+
+	mesh->copyVertexData(8, sizeof(Vertex), (void**)triangleData);
+	mesh->copyIndexData(36, sizeof(int), (void**)indices);
+}
 //function to draw shizzle
 void Render()
 {
@@ -265,21 +335,43 @@ void Render()
 	//clear colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//enable alpha blending for texty stufs
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//old code not sure if needed
+	////enable alpha blending for texty stufs
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(texture0Location, 0);
+	//GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, texture);
+	//glUniform1i(texture0Location, 0);
 
-	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
-	mat4 MVP = projMatrix * viewMatrix * worldMatrix;
-	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+	//GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
+	//mat4 MVP = projMatrix * viewMatrix * worldMatrix;
+	//glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
-	//actually draw the triangle
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+	////actually draw the triangle
+	//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+
+	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
+	{
+		(*iter)->render();
+		Mesh * currentMesh = (*iter)->getMesh();
+		Transform * currentTransform = (*iter)->getTransform();
+		Material * currentMaterial = (*iter)->getMaterial();
+
+		if (currentMesh && currentMaterial && currentTransform)
+		{
+			currentMesh->bind();
+			currentMaterial->bind();
+
+			GLint MVPLocation = currentMaterial->getUniformLocation("MVP");
+			Camera * camera = mainCamera->getCamera();
+			mat4 MVP = camera->getProjectionMatrix()*camera->getViewMatrix()*currentTransform->getModel();
+			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+
+			glDrawElements(GL_TRIANGLES, currentMesh->getIndexCount(), GL_UNSIGNED_INT, 0);
+		}
+	}
 
 	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
@@ -288,19 +380,20 @@ void Render()
 //function to update game state
 void Update()
 {
-	//this one for 3d
-	projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-	//this one for 2d font stuff
-	//projMatrix = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, 0.1f, 100.0f);
+	//old code, not sure if needed
+	////this one for 3d
+	//projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	////this one for 2d font stuff
+	////projMatrix = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, 0.1f, 100.0f);
 
-	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	//viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
-	worldMatrix = glm::translate(mat4(1.0f), vec3(-4.0f, -3.0f, 0.0f));
-}
+	//worldMatrix = glm::translate(mat4(1.0f), vec3(-4.0f, -3.0f, 0.0f));
 
-void createShader()
-{
-
+	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
+	{
+		(*iter)->update();
+	}
 }
 
 void createTexture()
@@ -390,20 +483,21 @@ int main(int argc, char*arg[])
 	}
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false);
-
 	//call our init opengl function
 	initOpenGL();
-	InitGeometry();
-	createTexture();
-
-	//for 2d font thing
-	//createFontTexture();
-	//initGeometryFromTexture(fontTexture);
-
+	CheckForErrors();
 	//set the wee viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	createShader();
+	Initialise();
+
+	//removed function calls
+	//InitGeometry();
+	//createTexture();
+	//createShader();
+	//for 2d font thing
+	//createFontTexture();
+	//initGeometryFromTexture(fontTexture);
 
 	SDL_Event event;
 
