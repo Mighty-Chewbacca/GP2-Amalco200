@@ -55,3 +55,8 @@ GameObject * Component::getParent()
 {
 	return m_Parent;
 }
+
+void Component::toggleActive()
+{
+	m_Active = !m_Active;
+}

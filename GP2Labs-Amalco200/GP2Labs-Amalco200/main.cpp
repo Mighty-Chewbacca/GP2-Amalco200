@@ -50,8 +50,8 @@ const std::string FONT_PATH = "/fonts";
 SDL_Window*window;
 
 //constants to control window creation
-const int WINDOW_HEIGHT = 480;
-const int WINDOW_WIDTH = 640;
+const int WINDOW_HEIGHT = 1080;
+const int WINDOW_WIDTH = 1920;
 
 //while running this is true
 bool running = true;
@@ -96,27 +96,15 @@ GameObject * mainCamera;
 
 //triangle data contains xyz
 Vertex triangleData[] = {
-#pragma region Front_face
-	//Front face
-		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Left
-
-		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
-
-		{ vec3{ 0.5f, -0.5f, 0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } }, //Bottom Right
-
-		{ vec3{ 0.5f, 0.5f, 0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Right
-#pragma endregion
-
-#pragma region Back_face
-		//back face
-		{ vec3{ -0.5f, 0.5f, -0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } },// Top Left
-
-		{ vec3{ -0.5f, -0.5f, -0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Bottom Left
-
-		{ vec3{ 0.5f, -0.5f, -0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 0.0f, 1.0f } }, //Bottom Right
-
-		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Top Right
-#pragma endregion
+		{ vec3(-0.5f, 0.5f, 0.5f), vec2(0.0f, 0.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f) },// Top Left
+		{ vec3(-0.5f, -0.5f, 0.5f), vec2(0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f) },// Bottom Left
+		{ vec3(0.5f, -0.5f, 0.5f), vec2(1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f) }, //Bottom Right
+		{ vec3(0.5f, 0.5f, 0.5f), vec2(1.0f, 0.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f) },// Top Right
+		//back
+		{ vec3(-0.5f, 0.5f, -0.5f), vec2(0.0f, 0.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f) },// Top Left
+		{ vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f) },// Bottom Left
+		{ vec3(0.5f, -0.5f, -0.5f), vec2(1.0f, 1.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f) }, //Bottom Right
+		{ vec3(0.5f, 0.5f, -0.5f), vec2(1.0f, 0.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f) }// Top Right
 };
 
 
@@ -126,22 +114,23 @@ GLuint indices[] = {
 	//this renders the cube incorrectly i believe, not sure why, have checked the attribarrays and they look okay
 
 	//front
-	0, 1, 2, 0, 3, 2,
-
+	0, 1, 2,
+	0, 3, 2,
 	//left
-	4, 5, 1, 4, 1, 0,
-
+	4, 5, 1,
+	4, 1, 0,
 	//right
-	3, 7, 2, 7, 6, 2,
-
+	3, 7, 2,
+	7, 6, 2,
 	//bottom
-	1, 5, 2, 6, 2, 1,
-
+	1, 5, 2,
+	6, 2, 1,
 	//top
-	5, 0, 7, 5, 7, 3,
-
+	5, 0, 7,
+	5, 7, 3,
 	//back
-	4, 5, 6, 4, 7, 6
+	4, 5, 6,
+	4, 7, 6
 };
 
 
@@ -287,9 +276,10 @@ void ChangeAxis(int newAxis)
 void Initialise()
 {
 	mainCamera = new GameObject();
-	Transform * transform = new Transform();
-	transform->setPosition(0.0f, 0.0f, 10.0f);
-	mainCamera->setTransform(transform);
+	Transform * cameratransform = new Transform();
+	cameratransform->setPosition(0.0f, 0.0f, 10.0f);
+	vec3 scale = cameratransform->getScale();
+	mainCamera->setTransform(cameratransform);
 
 	Camera * camera = new Camera();
 	camera->setAspectRatio((float)(WINDOW_WIDTH / WINDOW_HEIGHT));
@@ -312,7 +302,6 @@ void Initialise()
 	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
 	material->loadShader(vsPath, fsPath);
 	cube->setMaterial(material);
-
 	Mesh * mesh = new Mesh();
 	cube->setMesh(mesh);
 
@@ -329,51 +318,30 @@ void Initialise()
 //function to draw shizzle
 void Render()
 {
-	//set the clear colourt which is the background
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	//clear colour and depth buffer
+	//old imediate mode!
+	//Set the clear colour(background)
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
+	//clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//old code not sure if needed
-	////enable alpha blending for texty stufs
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, texture);
-	//glUniform1i(texture0Location, 0);
-
-	//GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
-	//mat4 MVP = projMatrix * viewMatrix * worldMatrix;
-	//glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
-	////actually draw the triangle
-	//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
+	//alternative sytanx
 	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
 	{
 		(*iter)->render();
 		Mesh * currentMesh = (*iter)->getMesh();
 		Transform * currentTransform = (*iter)->getTransform();
 		Material * currentMaterial = (*iter)->getMaterial();
-
 		if (currentMesh && currentMaterial && currentTransform)
 		{
-			currentMesh->bind();
 			currentMaterial->bind();
-
+			currentMesh->bind();
 			GLint MVPLocation = currentMaterial->getUniformLocation("MVP");
-			Camera * camera = mainCamera->getCamera();
-			mat4 MVP = camera->getProjectionMatrix()*camera->getViewMatrix()*currentTransform->getModel();
+			Camera * cam = mainCamera->getCamera();
+			mat4 MVP = cam->getProjectionMatrix()*cam->getViewMatrix()*currentTransform->getModel();
 			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
 			glDrawElements(GL_TRIANGLES, currentMesh->getIndexCount(), GL_UNSIGNED_INT, 0);
 		}
 	}
-
-	//require to swap front and back buffers
 	SDL_GL_SwapWindow(window);
 }
 
@@ -491,14 +459,6 @@ int main(int argc, char*arg[])
 
 	Initialise();
 
-	//removed function calls
-	//InitGeometry();
-	//createTexture();
-	//createShader();
-	//for 2d font thing
-	//createFontTexture();
-	//initGeometryFromTexture(fontTexture);
-
 	SDL_Event event;
 
 	while (running)
@@ -511,7 +471,7 @@ int main(int argc, char*arg[])
 				//set boolean to false to exit game loop
 				running = false;
 			}
-
+#pragma region input stuff
 			//open case statement
 			switch (event.type){
 				//try to find a keypress :)
@@ -572,6 +532,7 @@ int main(int argc, char*arg[])
 				}
 				break;
 			}
+#pragma endregion
 		}
 
 		Update();

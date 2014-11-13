@@ -46,6 +46,7 @@ private:
 	Mesh *m_Mesh;
 	Material *m_Material;
 	Camera *m_Camera;
+	GameObject *m_Parent;
 };
 
 

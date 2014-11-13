@@ -31,13 +31,13 @@ void Mesh::init()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
 
-	//tell shader that first element of structure is vertex texture coordinates
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
+	////tell shader that first element of structure is vertex texture coordinates
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
 
-	//tell shader that first element of structure is vertex colour
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec2)));
+	////tell shader that first element of structure is vertex colour
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec2)));
 }
 
 void Mesh::destroy()
@@ -49,16 +49,16 @@ void Mesh::destroy()
 
 void Mesh::copyVertexData(int count, int stride, void** data)
 {
+	m_VertexCount = count;
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(count * stride), data, GL_STATIC_DRAW);
-	m_VertexCount = count;
 }
 
 void Mesh::copyIndexData(int count, int stride, void** data)
 {
+	m_IndexCount = count;
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(count * stride), data, GL_STATIC_DRAW);
-	m_IndexCount = count;
 }
 
 void Mesh::bind()
