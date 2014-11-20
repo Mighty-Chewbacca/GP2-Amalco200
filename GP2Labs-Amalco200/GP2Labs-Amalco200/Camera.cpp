@@ -1,6 +1,10 @@
-#include "Camera.h"
+//includes
 #include "GameObject.h"
-#include"Transform.h"
+#include "Component.h"
+#include "Transform.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 Camera::Camera()
 {

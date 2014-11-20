@@ -1,4 +1,10 @@
+//includes
+#include "GameObject.h"
+#include "Component.h"
+#include "Transform.h"
 #include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 Mesh::Mesh()
 {
@@ -33,11 +39,15 @@ void Mesh::init()
 
 	//tell shader that first element of structure is vertex texture coordinates
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
 
 	//tell shader that first element of structure is vertex colour
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec2)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec3)));
+
+	//tell shader that first element of structure is vertex colour
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) + sizeof(vec3) + sizeof(vec2)));
 }
 
 void Mesh::destroy()

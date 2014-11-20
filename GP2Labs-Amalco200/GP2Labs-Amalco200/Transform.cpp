@@ -1,4 +1,10 @@
+//includes
+#include "GameObject.h"
+#include "Component.h"
 #include "Transform.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 //constructor
 Transform::Transform()
@@ -27,6 +33,11 @@ void Transform::update()
 		mat4 rotation = rotationX * rotationY * rotationZ;
 
 		m_Model = translate * rotation * scale;
+
+		if (m_Parent->getParent())
+		{
+			m_Model = m_Parent->getParent()->getTransform()->getModel()*m_Model;
+		}
 	}
 }
 

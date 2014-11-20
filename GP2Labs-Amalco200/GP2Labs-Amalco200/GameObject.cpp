@@ -13,6 +13,7 @@ GameObject::GameObject()
 	m_Material = NULL;
 	m_Camera = NULL;
 	m_name = "GameObject";
+	m_Parent = NULL;
 }
 
 GameObject::~GameObject()
@@ -26,6 +27,12 @@ void GameObject::init()
 	{
 		(*iter)->init();
 	}
+
+	//call init on children
+	for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
+	{
+		(*iter)->init();
+	}
 }
 
 void GameObject::update()
@@ -34,11 +41,23 @@ void GameObject::update()
 	{
 		(*iter)->update();
 	}
+
+	//call update on children
+	for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
+	{
+		(*iter)->update();
+	}
 }
 
 void GameObject::render()
 {
 	for (auto iter = m_Components.begin(); iter != m_Components.end(); iter++)
+	{
+		(*iter)->render();
+	}
+
+	//call render on children as well
+	for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
 	{
 		(*iter)->render();
 	}
@@ -62,6 +81,24 @@ void GameObject::destroy()
 		}
 	}
 	m_Components.clear();
+
+	//iter through and destroy children as well
+	auto iterChildren = m_Children.begin();
+	while (iterChildren != m_Children.end())
+	{
+		(*iterChildren)->destroy();
+		if ((*iterChildren))
+		{
+			delete (*iterChildren);
+			(*iterChildren) = NULL;
+			iterChildren = m_Children.erase(iterChildren);
+		}
+		else
+		{
+			iterChildren++;
+		}
+	}
+	m_Children.clear();
 }
 
 void GameObject::addComponent(Component * component)
@@ -103,6 +140,12 @@ void GameObject::setCamera(Camera *camera)
 	m_Camera = camera;
 	addComponent(camera);
 }
+
+void GameObject::setParent(GameObject *parent)
+{
+	m_Parent = parent;
+}
+
 Transform * GameObject::getTransform()
 {
 	return m_Transform;
@@ -121,4 +164,29 @@ Material * GameObject::getMaterial()
 Camera * GameObject::getCamera()
 {
 	return m_Camera;
+}
+
+GameObject * GameObject::getParent()
+{
+	return m_Parent;
+}
+
+void GameObject::addChild(GameObject* child)
+{
+	m_Children.push_back(child);
+}
+
+int GameObject::getChildCount()
+{
+	return m_Children.size();
+}
+
+GameObject* GameObject::getChild(int index)
+{
+	if (index <= m_Children.size())
+	{
+		return m_Children[index];
+	}
+
+	//do some error message here
 }

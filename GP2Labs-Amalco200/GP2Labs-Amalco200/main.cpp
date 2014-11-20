@@ -24,15 +24,17 @@ using glm::vec3;
 #include <vector>
 
 #ifdef _DEBUG && WIN32
-const std::string ASSET_PATH = "assets";
-const std::string SHADER_PATH = "/shaders";
-const std::string TEXTURE_PATH = "/textures";
-const std::string FONT_PATH = "/fonts";
+const std::string ASSET_PATH = "assets/";
+const std::string SHADER_PATH = "/shaders/";
+const std::string TEXTURE_PATH = "/textures/";
+const std::string FONT_PATH = "/fonts/";
+const std::string MODEL_PATH = "/models/";
 #else
 const std::string ASSET_PATH = "/assets";
 const std::string SHADER_PATH = "/shaders";
 const std::string TEXTURE_PATH = "/textures";
 const std::string FONT_PATH = "/fonts";
+const std::string MODEL_PATH = "/models";
 #endif
 
 //includes for custom headers made by me
@@ -44,6 +46,7 @@ const std::string FONT_PATH = "/fonts";
 #include "Mesh.h"
 #include "Material.h"
 #include "Camera.h"
+#include "FBXLoader.h"
 
 //Global variables here
 //pointer to SDL windows
@@ -93,57 +96,6 @@ GLuint fontTexture;
 std::vector<GameObject*> displayList;
 
 GameObject * mainCamera;
-
-//triangle data contains xyz
-Vertex triangleData[] = {
-#pragma region Front_face
-	//Front face
-		{ vec3{ -0.5f, 0.5f, 0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Left
-
-		{ vec3{ -0.5f, -0.5f, 0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Bottom Left
-
-		{ vec3{ 0.5f, -0.5f, 0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } }, //Bottom Right
-
-		{ vec3{ 0.5f, 0.5f, 0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Top Right
-#pragma endregion
-
-#pragma region Back_face
-		//back face
-		{ vec3{ -0.5f, 0.5f, -0.5f }, vec2{ 0.0f, 0.0f }, vec4{ 0.0f, 0.0f, 1.0f, 1.0f } },// Top Left
-
-		{ vec3{ -0.5f, -0.5f, -0.5f }, vec2{ 0.0f, 1.0f }, vec4{ 1.0f, 0.0f, 0.0f, 1.0f } },// Bottom Left
-
-		{ vec3{ 0.5f, -0.5f, -0.5f }, vec2{ 1.0f, 1.0f }, vec4{ 0.0f, 0.0f, 0.0f, 1.0f } }, //Bottom Right
-
-		{ vec3{ 0.5f, 0.5f, -0.5f }, vec2{ 1.0f, 0.0f }, vec4{ 0.0f, 1.0f, 0.0f, 1.0f } },// Top Right
-#pragma endregion
-};
-
-
-GLuint indices[] = {
-
-	//personal notes, every 3 numbers relates to 1 triangle, they connect to each other, the number relates to the number of the vertice and not the amount of times it is touched
-	//this renders the cube incorrectly i believe, not sure why, have checked the attribarrays and they look okay
-
-	//front
-	0, 1, 2, 0, 3, 2,
-
-	//left
-	4, 5, 1, 4, 1, 0,
-
-	//right
-	3, 7, 2, 7, 6, 2,
-
-	//bottom
-	1, 5, 2, 6, 2, 1,
-
-	//top
-	5, 0, 7, 5, 7, 3,
-
-	//back
-	4, 5, 6, 4, 7, 6
-};
-
 
 //sdl gl context
 SDL_GLContext glcontext = NULL;
@@ -300,32 +252,57 @@ void Initialise()
 	mainCamera->setCamera(camera);
 	displayList.push_back(mainCamera);
 
-	GameObject * cube = new GameObject();
-	cube->setName("Cube");
+	std::string modelPath = ASSET_PATH + MODEL_PATH + "armoredrecon.fbx";
+	GameObject* go = loadFBXFromFile(modelPath);
+	for (int i = 0; i < go->getChildCount(); i++)
+	{
+		Material* material = new Material();
+		material->init();
+		std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
+		std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
+		material->loadShader(vsPath, fsPath);
 
-	Transform *cubetransform = new Transform();
-	cubetransform->setPosition(0.0f, 0.0f, 2.0f);
-	cube->setTransform(cubetransform);
-
-	Material * material = new Material();
-	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
-	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
-	material->loadShader(vsPath, fsPath);
-	cube->setMaterial(material);
-
-	Mesh * mesh = new Mesh();
-	cube->setMesh(mesh);
-
-	displayList.push_back(cube);
+		go->getChild(i)->setMaterial(material);
+	}
+	displayList.push_back(go);
 
 	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
 	{
 		(*iter)->init();
 	}
-
-	mesh->copyVertexData(8, sizeof(Vertex), (void**)triangleData);
-	mesh->copyIndexData(36, sizeof(int), (void**)indices);
 }
+
+void renderGameObject(GameObject *pObject)
+{
+	if (!pObject)
+	{
+		return;
+	}
+
+	(pObject)->render();
+	Mesh * currentMesh = (pObject)->getMesh();
+	Transform * currentTransform = (pObject)->getTransform();
+	Material * currentMaterial = (pObject)->getMaterial();
+
+	if (currentMesh && currentMaterial && currentTransform)
+	{
+		currentMesh->bind();
+		currentMaterial->bind();
+
+		GLint MVPLocation = currentMaterial->getUniformLocation("MVP");
+		Camera * camera = mainCamera->getCamera();
+		mat4 MVP = camera->getProjectionMatrix()*camera->getViewMatrix()*currentTransform->getModel();
+		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+
+		glDrawElements(GL_TRIANGLES, currentMesh->getIndexCount(), GL_UNSIGNED_INT, 0);
+	}
+
+	for (int i = 0; i < pObject->getChildCount(); i++)
+	{
+		renderGameObject(pObject->getChild(i));
+	}
+}
+
 //function to draw shizzle
 void Render()
 {
@@ -335,42 +312,9 @@ void Render()
 	//clear colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//old code not sure if needed
-	////enable alpha blending for texty stufs
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//GLint texture0Location = glGetUniformLocation(shaderProgram, "texture0");
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, texture);
-	//glUniform1i(texture0Location, 0);
-
-	//GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
-	//mat4 MVP = projMatrix * viewMatrix * worldMatrix;
-	//glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
-	////actually draw the triangle
-	//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
 	for (auto iter = displayList.begin(); iter != displayList.end(); iter++)
 	{
-		(*iter)->render();
-		Mesh * currentMesh = (*iter)->getMesh();
-		Transform * currentTransform = (*iter)->getTransform();
-		Material * currentMaterial = (*iter)->getMaterial();
-
-		if (currentMesh && currentMaterial && currentTransform)
-		{
-			currentMesh->bind();
-			currentMaterial->bind();
-
-			GLint MVPLocation = currentMaterial->getUniformLocation("MVP");
-			Camera * camera = mainCamera->getCamera();
-			mat4 MVP = camera->getProjectionMatrix()*camera->getViewMatrix()*currentTransform->getModel();
-			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
-			glDrawElements(GL_TRIANGLES, currentMesh->getIndexCount(), GL_UNSIGNED_INT, 0);
-		}
+		renderGameObject((*iter));
 	}
 
 	//require to swap front and back buffers
@@ -414,49 +358,49 @@ void createFontTexture()
 
 }
 
-void initGeometryFromTexture(GLuint textureID)
-{
-	int width, height;
-
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-
-	Vertex spriteData[] = {
-
-			{ vec3(10.0, 10.0f, 0.0f), vec2(0.0f, 0.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },//	Top	Left
-
-			{ vec3(10.0f, height + 10, 0.0f), vec2(0.0f, 1.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },//	Bottom	Left
-
-			{ vec3(width + 10, height + 10, 0.0f), vec2(1.0f, 1.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },	//Bottom	Right
-
-			{ vec3(width + 10, 10.0f, 0.0f), vec2(1.0f, 0.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) }//	Top	Right
-	};
-
-	GLuint spriteIndices[] = {
-		0, 1, 2,
-		0, 3, 2
-	};
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &triangleVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), spriteData, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &triangleEBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(int), spriteIndices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) +sizeof(vec2)));
-
-}
+//void initGeometryFromTexture(GLuint textureID)
+//{
+//	int width, height;
+//
+//	glBindTexture(GL_TEXTURE_2D, textureID);
+//	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+//	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+//
+//	Vertex spriteData[] = {
+//
+//			{ vec3(10.0, 10.0f, 0.0f), vec2(0.0f, 0.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },//	Top	Left
+//
+//			{ vec3(10.0f, height + 10, 0.0f), vec2(0.0f, 1.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },//	Bottom	Left
+//
+//			{ vec3(width + 10, height + 10, 0.0f), vec2(1.0f, 1.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) },	//Bottom	Right
+//
+//			{ vec3(width + 10, 10.0f, 0.0f), vec2(1.0f, 0.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f) }//	Top	Right
+//	};
+//
+//	GLuint spriteIndices[] = {
+//		0, 1, 2,
+//		0, 3, 2
+//	};
+//
+//	glGenVertexArrays(1, &VAO);
+//	glBindVertexArray(VAO);
+//
+//	glGenBuffers(1, &triangleVBO);
+//	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+//	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), spriteData, GL_STATIC_DRAW);
+//
+//	glGenBuffers(1, &triangleEBO);
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(int), spriteIndices, GL_STATIC_DRAW);
+//
+//	glEnableVertexAttribArray(0);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+//	glEnableVertexAttribArray(1);
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)sizeof(vec3));
+//	glEnableVertexAttribArray(2);
+//	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(vec3) +sizeof(vec2)));
+//
+//}
 
 //Main method - program entry point
 int main(int argc, char*arg[])

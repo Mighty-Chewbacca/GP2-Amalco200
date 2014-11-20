@@ -1,5 +1,11 @@
 #include "Material.h"
 #include "Shader.h"
+#include "GameObject.h"
+#include "Component.h"
+#include "Transform.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 Material::Material()
 {
@@ -40,8 +46,9 @@ bool Material::loadShader(const std::string& vsFilename, const std::string& fsFi
 	glDeleteShader(fragmentShaderProgram);
 
 	glBindAttribLocation(m_ShaderProgram, 0, "vertexPosition");
-	glBindAttribLocation(m_ShaderProgram, 1, "vertexTexCoords");
-	glBindAttribLocation(m_ShaderProgram, 2, "vertexColour");
+	glBindAttribLocation(m_ShaderProgram, 1, "vertexNormals");
+	glBindAttribLocation(m_ShaderProgram, 2, "vertexTexCoords");
+	glBindAttribLocation(m_ShaderProgram, 3, "vertexColour");
 
 	return true;
 }

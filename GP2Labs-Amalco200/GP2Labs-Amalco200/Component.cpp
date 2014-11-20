@@ -1,5 +1,10 @@
-#include "Component.h"
+//includes
 #include "GameObject.h"
+#include "Component.h"
+#include "Transform.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Camera.h"
 
 
 //constructor
